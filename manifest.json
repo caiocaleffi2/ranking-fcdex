@@ -1,0 +1,15 @@
+{
+  "name": "Ranking FCDEX",
+  "short_name": "FCDEX",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#0b5ed7",
+  "icons": [
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/861/861512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
