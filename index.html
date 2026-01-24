@@ -3,6 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#121212">
+
 <title>Ranking FCDEX</title>
 
 <!-- ÍCONE -->
@@ -242,6 +246,14 @@ function filtrar() {
 
 function toggleDark() {
   document.body.classList.toggle("dark");
+}
+</script>
+
+<script>
+if ("serviceWorker" in navigator) {
+  navigator.serviceWorker.register("sw.js")
+    .then(() => console.log("Service Worker registrado"))
+    .catch(err => console.log("Erro no SW:", err));
 }
 </script>
 
