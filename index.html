@@ -34,7 +34,6 @@
     font-size: 16px;
   }
   .aproveitamento {
-    color: #2ecc71;
     font-weight: bold;
     font-size: 16px;
   }
@@ -74,17 +73,32 @@ const detalhesDiv = document.getElementById("detalhes");
 fetch(URL)
   .then(res => res.json())
   .then(dados => {
-    dados.sort((a, b) =>
-      parseFloat(b.Aproveitamento) - parseFloat(a.Aproveitamento)
-    );
+
+    // PASSO 2 — Ordenar por aproveitamento
+    dados.sort((a, b) => {
+      return parseFloat(b.Aproveitamento.replace('%','')) -
+             parseFloat(a.Aproveitamento.replace('%',''));
+    });
 
     dados.forEach((jogador, index) => {
+
+      // PASSO 1 — Cor do aproveitamento
+      const aproveitamentoNum =
+        parseFloat(jogador.Aproveitamento.replace('%',''));
+
+      let cor = "red";
+      if (aproveitamentoNum >= 70) cor = "green";
+      else if (aproveitamentoNum >= 40) cor = "orange";
+
       const card = document.createElement("div");
       card.className = "card";
       card.innerHTML = `
         <div class="rank">${index + 1}º ${jogador.Jogador}</div>
-        <div class="aproveitamento">${jogador.Aproveitamento}</div>
+        <div class="aproveitamento" style="color:${cor}">
+          ${aproveitamentoNum}%
+        </div>
       `;
+
       card.onclick = () => mostrarDetalhes(jogador);
       rankingDiv.appendChild(card);
     });
@@ -93,6 +107,13 @@ fetch(URL)
 function mostrarDetalhes(j) {
   rankingDiv.style.display = "none";
   detalhesDiv.style.display = "block";
+
+  const aproveitamentoNum =
+    parseFloat(j.Aproveitamento.replace('%',''));
+
+  let cor = "red";
+  if (aproveitamentoNum >= 70) cor = "green";
+  else if (aproveitamentoNum >= 40) cor = "orange";
 
   detalhesDiv.innerHTML = `
     <div class="voltar" onclick="voltar()">← Voltar</div>
@@ -103,7 +124,14 @@ function mostrarDetalhes(j) {
     <p>Derrotas: ${j.Derrota}</p>
     <p>Faltas: ${j.Falta}</p>
     <p>Pontos: ${j.Pontuação}</p>
-    <p><strong>Aproveitamento: ${j.Aproveitamento}</strong></p>
+    <p>
+      <strong>
+        Aproveitamento:
+        <span style="color:${cor}">
+          ${aproveitamentoNum}%
+        </span>
+      </strong>
+    </p>
   `;
 }
 
