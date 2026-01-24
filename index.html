@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ranking FCDEX</title>
+
+<style>
+  body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #f2f2f2;
+  }
+  header {
+    background: #ffffff;
+    padding: 15px;
+    font-size: 20px;
+    font-weight: bold;
+    text-align: center;
+    box-shadow: 0 2px 4px rgba(0,0,0,.1);
+  }
+  .card {
+    background: #fff;
+    margin: 10px;
+    padding: 15px;
+    border-radius: 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+  }
+  .rank {
+    font-weight: bold;
+    font-size: 16px;
+  }
+  .aproveitamento {
+    color: #2ecc71;
+    font-weight: bold;
+    font-size: 16px;
+  }
+  .detalhes {
+    display: none;
+    padding: 15px;
+  }
+  .detalhes h2 {
+    margin-top: 0;
+  }
+  .voltar {
+    color: #0066cc;
+    cursor: pointer;
+    margin-bottom: 10px;
+    display: inline-block;
+  }
+</style>
+</head>
+
+<body>
+
+<header>🏆 Ranking FCDEX</header>
+
+<div id="ranking"></div>
+
+<div id="detalhes" class="detalhes"></div>
+
+<script>
+const SHEET_ID = "1axJMakPXrMPjsIfmJoMMXQ35qzND9_NnL7JdI6k_R5U";
+const ABA = "Ranking";
+
+const URL = `https://opensheet.elk.sh/${SHEET_ID}/${ABA}`;
+
+const rankingDiv = document.getElementById("ranking");
+const detalhesDiv = document.getElementById("detalhes");
+
+fetch(URL)
+  .then(res => res.json())
+  .then(dados => {
+    dados.sort((a, b) =>
+      parseFloat(b.Aproveitamento) - parseFloat(a.Aproveitamento)
+    );
+
+    dados.forEach((jogador, index) => {
+      const card = document.createElement("div");
+      card.className = "card";
+      card.innerHTML = `
+        <div class="rank">${index + 1}º ${jogador.Jogador}</div>
+        <div class="aproveitamento">${jogador.Aproveitamento}</div>
+      `;
+      card.onclick = () => mostrarDetalhes(jogador);
+      rankingDiv.appendChild(card);
+    });
+  });
+
+function mostrarDetalhes(j) {
+  rankingDiv.style.display = "none";
+  detalhesDiv.style.display = "block";
+
+  detalhesDiv.innerHTML = `
+    <div class="voltar" onclick="voltar()">← Voltar</div>
+    <h2>${j.Jogador}</h2>
+    <p>Jogos: ${j.Jogos}</p>
+    <p>Vitórias: ${j.Vitorias}</p>
+    <p>Empates: ${j.Empates}</p>
+    <p>Derrotas: ${j.Derrotas}</p>
+    <p>Pontos: ${j.Pontos}</p>
+    <p><strong>Aproveitamento: ${j.Aproveitamento}</strong></p>
+  `;
+}
+
+function voltar() {
+  detalhesDiv.style.display = "none";
+  rankingDiv.style.display = "block";
+}
+</script>
+
+</body>
+</html>
