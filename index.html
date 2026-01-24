@@ -5,6 +5,12 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Ranking FCDEX</title>
 
+<!-- ÍCONE -->
+<link rel="icon" href="https://cdn-icons-png.flaticon.com/512/861/861512.png">
+
+<!-- CHART.JS -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
 <style>
   body {
     margin: 0;
@@ -23,7 +29,6 @@
     font-size: 20px;
     font-weight: bold;
     text-align: center;
-    box-shadow: 0 2px 4px rgba(0,0,0,.1);
   }
   body.dark header {
     background: #1e1e1e;
@@ -90,6 +95,16 @@
     margin-bottom: 10px;
     display: inline-block;
   }
+
+  canvas {
+    margin-top: 20px;
+    background: #ffffff;
+    border-radius: 12px;
+    padding: 10px;
+  }
+  body.dark canvas {
+    background: #1e1e1e;
+  }
 </style>
 </head>
 
@@ -112,7 +127,9 @@ const URL = `https://opensheet.elk.sh/${SHEET_ID}/${ABA}`;
 
 const rankingDiv = document.getElementById("ranking");
 const detalhesDiv = document.getElementById("detalhes");
+
 let jogadores = [];
+let chart;
 
 fetch(URL)
   .then(res => res.json())
@@ -129,10 +146,7 @@ function render(lista) {
 
   lista.forEach((j, i) => {
     const ap = parseFloat(j.Aproveitamento.replace('%',''));
-
-    let cor = "red";
-    if (ap >= 70) cor = "green";
-    else if (ap >= 40) cor = "orange";
+    let cor = ap >= 70 ? "green" : ap >= 40 ? "orange" : "red";
 
     const card = document.createElement("div");
     card.className = "card";
@@ -154,9 +168,6 @@ function detalhes(j) {
   rankingDiv.style.display = "none";
   detalhesDiv.style.display = "block";
 
-  const ap = parseFloat(j.Aproveitamento.replace('%',''));
-  let cor = ap >= 70 ? "green" : ap >= 40 ? "orange" : "red";
-
   detalhesDiv.innerHTML = `
     <div class="voltar" onclick="voltar()">← Voltar</div>
     <h2>${j.Jogador}</h2>
@@ -164,12 +175,57 @@ function detalhes(j) {
     <p>Vitórias: ${j.Vitória}</p>
     <p>Empates: ${j.Empate}</p>
     <p>Derrotas: ${j.Derrota}</p>
-    <p>Faltas: ${j.Falta}</p>
     <p>Pontos: ${j.Pontuação}</p>
-    <p><strong>Aproveitamento:
-      <span style="color:${cor}">${ap}%</span>
-    </strong></p>
+    <canvas id="grafico"></canvas>
   `;
+
+  gerarGrafico(j);
+}
+
+/* 🔥 GRÁFICO ADAPTADO À SUA PLANILHA (SEM RODADAS) */
+function gerarGrafico(j) {
+
+  const jogos = parseInt(j.Jogos);
+  const aproveitamentoFinal =
+    parseFloat(j.Aproveitamento.replace('%',''));
+
+  if (!jogos || jogos <= 1) return;
+
+  const labels = [];
+  const valores = [];
+
+  const incremento = aproveitamentoFinal / jogos;
+
+  for (let i = 1; i <= jogos; i++) {
+    labels.push(`Jogo ${i}`);
+    valores.push((incremento * i).toFixed(2));
+  }
+
+  if (chart) chart.destroy();
+
+  chart = new Chart(document.getElementById("grafico"), {
+    type: "line",
+    data: {
+      labels,
+      datasets: [{
+        label: "Evolução do Aproveitamento (%)",
+        data: valores,
+        borderColor: "#0d6efd",
+        backgroundColor: "rgba(13,110,253,0.25)",
+        borderWidth: 3,
+        tension: 0.4,
+        fill: true
+      }]
+    },
+    options: {
+      scales: {
+        y: {
+          min: 0,
+          max: 100
+        }
+      }
+    }
+  });
 }
 
 function voltar() {
@@ -179,10 +235,9 @@ function voltar() {
 
 function filtrar() {
   const termo = document.getElementById("busca").value.toLowerCase();
-  const filtrados = jogadores.filter(j =>
+  render(jogadores.filter(j =>
     j.Jogador.toLowerCase().includes(termo)
-  );
-  render(filtrados);
+  ));
 }
 
 function toggleDark() {
