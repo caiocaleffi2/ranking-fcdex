@@ -232,8 +232,22 @@ function renderJogos(lista){
  listaJogos.innerHTML="";
  lista.forEach(j=>{
   listaJogos.innerHTML+=`
-   <div class="card" onclick="abrirModal('${j.Time_Casa}','${j.Time_Fora}','${j.Artilharia_Casa}','${j.Artilharia_Fora}')">
-    <strong>Rodada ${j.Rodada}</strong><br><br>
+   <div class="card" onclick="abrirModal(
+     '${j.Time_Casa}',
+     '${j.Time_Fora}',
+     '${j.Artilharia_Casa}',
+     '${j.Artilharia_Fora}'
+   )">
+
+    <strong>Rodada ${j.Rodada}</strong><br>
+    <small>
+      📅 ${j.Data || "Data a definir"} |
+      ⏰ ${j.Hora || "--:--"}<br>
+      📍 ${j.Local || "Local não informado"}
+    </small>
+
+    <br><br>
+
     <div class="linha">
      <span>${j.Time_Casa}</span>
      <strong>${j.Gols_Casa} x ${j.Gols_Fora}</strong>
@@ -242,6 +256,7 @@ function renderJogos(lista){
    </div>`;
  });
 }
+
 
 function abrirModal(c,f,ac,af){
  modalTitulo.innerText=`${c} x ${f}`;
