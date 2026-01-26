@@ -3,151 +3,68 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-
 <title>Ranking FCDEX</title>
 
-<!-- PWA -->
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#121212">
-
 <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/861/861512.png">
+
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <style>
-body {
-  margin: 0;
-  font-family: Arial, sans-serif;
-  background: #f2f2f2;
-}
-body.dark {
-  background: #121212;
-  color: #fff;
-}
+body{margin:0;font-family:Arial;background:#f2f2f2}
+body.dark{background:#121212;color:#fff}
+header{background:#fff;padding:15px;text-align:center;font-size:20px;font-weight:bold}
+body.dark header{background:#1e1e1e}
 
-header {
-  background: #fff;
-  padding: 15px;
-  text-align: center;
-  font-size: 20px;
-  font-weight: bold;
-}
-body.dark header {
-  background: #1e1e1e;
-}
+.top-bar{display:flex;gap:10px;padding:10px}
+input,select{flex:1;padding:10px;border-radius:8px;border:1px solid #ccc}
+button{padding:10px;border-radius:8px;border:none;cursor:pointer}
 
-.top-bar {
-  display: flex;
-  gap: 10px;
-  padding: 10px;
-}
+.card{background:#fff;margin:10px;padding:15px;border-radius:12px;cursor:pointer}
+body.dark .card{background:#1e1e1e}
 
-input {
-  flex: 1;
-  padding: 10px;
-  border-radius: 8px;
-  border: 1px solid #ccc;
-}
+.linha{display:flex;justify-content:space-between;font-weight:bold}
 
-button {
-  padding: 10px;
-  border-radius: 8px;
-  border: none;
-  cursor: pointer;
-}
+.badge{padding:4px 10px;border-radius:12px;font-size:12px;color:#fff}
+.verde{background:green}
+.amarelo{background:orange}
+.vermelho{background:red}
 
-.card {
-  background: #fff;
-  margin: 10px;
-  padding: 15px;
-  border-radius: 12px;
-  cursor: pointer;
-}
-body.dark .card {
-  background: #1e1e1e;
-}
+.barra{height:8px;background:#ddd;border-radius:4px;margin-top:8px}
+.barra span{display:block;height:100%;border-radius:4px}
 
-.linha {
-  display: flex;
-  justify-content: space-between;
-  font-weight: bold;
-}
+.detalhes{display:none;padding:15px}
+.voltar{color:#0066cc;cursor:pointer;margin-bottom:10px}
 
-.barra {
-  height: 8px;
-  background: #ddd;
-  border-radius: 4px;
-  margin-top: 8px;
+.menu{
+ position:fixed;
+ bottom:0;
+ width:100%;
+ display:flex;
+ background:#fff;
+ border-top:1px solid #ccc
 }
-.barra span {
-  display: block;
-  height: 100%;
-}
-
-.detalhes {
-  display: none;
-  padding: 15px;
-}
-
-.voltar {
-  color: #0066cc;
-  cursor: pointer;
-  margin-bottom: 10px;
-}
-
-canvas {
-  margin-top: 20px;
-  background: #fff;
-  border-radius: 12px;
-  padding: 10px;
-}
-
-.menu {
-  position: fixed;
-  bottom: 0;
-  width: 100%;
-  display: flex;
-  background: #fff;
-  border-top: 1px solid #ccc;
-}
-body.dark .menu {
-  background: #1e1e1e;
-}
-.menu button {
-  flex: 1;
-}
+body.dark .menu{background:#1e1e1e}
+.menu button{flex:1}
 
 /* MODAL */
-.modal-bg {
-  display: none;
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,.6);
-  justify-content: center;
-  align-items: center;
-  z-index: 10;
+.modal-bg{
+ display:none;
+ position:fixed;
+ inset:0;
+ background:rgba(0,0,0,.6);
+ justify-content:center;
+ align-items:center
 }
-.modal {
-  background: #fff;
-  padding: 20px;
-  border-radius: 12px;
-  width: 90%;
-  max-width: 400px;
+.modal{
+ background:#fff;
+ padding:20px;
+ border-radius:12px;
+ width:90%;
+ max-width:400px
 }
-body.dark .modal {
-  background: #1e1e1e;
-}
-.modal h3 {
-  text-align: center;
-  margin-top: 0;
-}
-.times {
-  display: flex;
-  justify-content: space-between;
-  margin-top: 15px;
-}
-.times div {
-  width: 45%;
-}
+body.dark .modal{background:#1e1e1e}
 </style>
 </head>
 
@@ -160,11 +77,21 @@ body.dark .modal {
   <button onclick="toggleDark()">🌙</button>
 </div>
 
+<!-- TELAS -->
 <div id="ranking"></div>
 <div id="detalhes" class="detalhes"></div>
 <div id="estatisticas" style="display:none"></div>
-<div id="jogos" style="display:none"></div>
 
+<div id="jogos" style="display:none">
+  <div class="top-bar">
+    <select id="filtroRodada" onchange="filtrarRodada()">
+      <option value="todas">Todas as rodadas</option>
+    </select>
+  </div>
+  <div id="listaJogos"></div>
+</div>
+
+<!-- MENU -->
 <nav class="menu">
   <button onclick="mostrarTela('ranking')">🏆 Ranking</button>
   <button onclick="mostrarTela('estatisticas')">🎯 Artilharia</button>
@@ -175,202 +102,157 @@ body.dark .modal {
 <div class="modal-bg" id="modalBg" onclick="fecharModal(event)">
   <div class="modal">
     <h3 id="modalTitulo"></h3>
-    <div class="times">
-      <div>
-        <strong id="timeCasa"></strong>
-        <p id="golsCasa"></p>
-      </div>
-      <div>
-        <strong id="timeFora"></strong>
-        <p id="golsFora"></p>
-      </div>
-    </div>
+    <p id="destaquePartida"></p>
+    <hr>
+    <p><strong>Casa:</strong> <span id="golsCasa"></span></p>
+    <p><strong>Fora:</strong> <span id="golsFora"></span></p>
   </div>
 </div>
 
 <script>
-const SHEET_ID = "1axJMakPXrMPjsIfmJoMMXQ35qzND9_NnL7JdI6k_R5U";
-
-const URLS = {
-  ranking: `https://opensheet.elk.sh/${SHEET_ID}/Desempenho por Jogador`,
-  estatisticas: `https://opensheet.elk.sh/${SHEET_ID}/Estatisticas`,
-  jogos: `https://opensheet.elk.sh/${SHEET_ID}/Jogos`
+const SHEET_ID="1axJMakPXrMPjsIfmJoMMXQ35qzND9_NnL7JdI6k_R5U";
+const URLS={
+ ranking:`https://opensheet.elk.sh/${SHEET_ID}/Desempenho por Jogador`,
+ estatisticas:`https://opensheet.elk.sh/${SHEET_ID}/Estatisticas`,
+ jogos:`https://opensheet.elk.sh/${SHEET_ID}/Jogos`
 };
 
-const rankingDiv = document.getElementById("ranking");
-const detalhesDiv = document.getElementById("detalhes");
-const estatisticasDiv = document.getElementById("estatisticas");
-const jogosDiv = document.getElementById("jogos");
+let jogadores=[],jogosLista=[],chart;
 
-const modalBg = document.getElementById("modalBg");
-const modalTitulo = document.getElementById("modalTitulo");
-const timeCasa = document.getElementById("timeCasa");
-const timeFora = document.getElementById("timeFora");
-const golsCasa = document.getElementById("golsCasa");
-const golsFora = document.getElementById("golsFora");
-
-let jogadores = [];
-let chart;
-
-/* NAVEGAÇÃO */
-function mostrarTela(id) {
-  ["ranking","detalhes","estatisticas","jogos"].forEach(t => {
-    document.getElementById(t).style.display = "none";
-  });
-  document.getElementById(id).style.display = "block";
-  topBar.style.display = id === "ranking" ? "flex" : "none";
+/* TELAS */
+function mostrarTela(id){
+ ["ranking","detalhes","estatisticas","jogos"].forEach(t=>{
+  document.getElementById(t).style.display="none";
+ });
+ document.getElementById(id).style.display="block";
+ topBar.style.display=id==="ranking"?"flex":"none";
 }
 
 /* RANKING */
-fetch(URLS.ranking)
-.then(r => r.json())
-.then(d => {
-  jogadores = d.sort((a,b) =>
-    parseFloat(b.Aproveitamento) - parseFloat(a.Aproveitamento)
-  );
-  render(jogadores);
+fetch(URLS.ranking).then(r=>r.json()).then(d=>{
+ jogadores=d.sort((a,b)=>parseFloat(b.Aproveitamento)-parseFloat(a.Aproveitamento));
+ renderRanking(jogadores);
 });
 
-function render(lista) {
-  rankingDiv.innerHTML = "";
-  lista.forEach((j,i) => {
-    const ap = parseFloat(j.Aproveitamento);
-    const cor = ap >= 70 ? "green" : ap >= 40 ? "orange" : "red";
+function badge(ap){return ap>=70?"verde":ap>=40?"amarelo":"vermelho"}
 
-    const card = document.createElement("div");
-    card.className = "card";
-    card.innerHTML = `
-      <div class="linha">
-        <span>${i+1}º ${j.Jogador}</span>
-        <span style="color:${cor}">${ap}%</span>
-      </div>
-      <div class="barra">
-        <span style="width:${ap}%; background:${cor}"></span>
-      </div>
-    `;
-    card.onclick = () => detalhes(j);
-    rankingDiv.appendChild(card);
-  });
+function renderRanking(lista){
+ ranking.innerHTML="";
+ lista.forEach((j,i)=>{
+  const ap=parseFloat(String(j.Aproveitamento).replace("%","").replace(",","."))||0;
+  ranking.innerHTML+=`
+   <div class="card" onclick='mostrarDetalhes(${JSON.stringify(j)})'>
+    <div class="linha">
+     <span>${i+1}º ${j.Jogador}</span>
+     <span class="badge ${badge(ap)}">${ap}%</span>
+    </div>
+    <div class="barra">
+     <span style="width:${ap}%;background:${badge(ap)==="verde"?"green":badge(ap)==="amarelo"?"orange":"red"}"></span>
+    </div>
+   </div>`;
+ });
+}
+
+function filtrar(){
+ const t=busca.value.toLowerCase();
+ renderRanking(jogadores.filter(j=>j.Jogador.toLowerCase().includes(t)));
 }
 
 /* DETALHES */
-function detalhes(j) {
-  mostrarTela("detalhes");
-  detalhesDiv.innerHTML = `
-    <div class="voltar" onclick="mostrarTela('ranking')">← Voltar</div>
-    <h2>${j.Jogador}</h2>
-    <p>Jogos: ${j.Jogos}</p>
-    <p>Vitórias: ${j.Vitória}</p>
-    <p>Empates: ${j.Empate}</p>
-    <p>Derrotas: ${j.Derrota}</p>
-    <canvas id="grafico"></canvas>
-  `;
-  gerarGrafico(j);
+function mostrarDetalhes(j){
+ mostrarTela("detalhes");
+ detalhes.innerHTML=`
+  <div class="voltar" onclick="mostrarTela('ranking')">← Voltar</div>
+  <h2>${j.Jogador}</h2>
+  <p>Jogos: ${j.Jogos}</p>
+  <p>Vitórias: ${j.Vitória}</p>
+  <p>Empates: ${j.Empate}</p>
+  <p>Derrotas: ${j.Derrota}</p>
+  <canvas id="grafico" height="220"></canvas>`;
+ gerarGrafico(j);
 }
 
-function gerarGrafico(j) {
-  const jogos = parseInt(j.Jogos);
-  const final = parseFloat(j.Aproveitamento);
-  const labels = [];
-  const valores = [];
-  const inc = final / jogos;
-
-  for (let i=1;i<=jogos;i++) {
-    labels.push(`Jogo ${i}`);
-    valores.push((inc*i).toFixed(2));
-  }
-
-  if (chart) chart.destroy();
-  chart = new Chart(document.getElementById("grafico"), {
-    type: "line",
-    data: {
-      labels,
-      datasets: [{
-        label: "Evolução do Aproveitamento (%)",
-        data: valores,
-        borderWidth: 3,
-        tension: 0.4,
-        fill: true
-      }]
-    },
-    options: { scales: { y: { min:0, max:100 } } }
-  });
+function gerarGrafico(j){
+ const v=+j.Vitória||0,e=+j.Empate||0,d=+j.Derrota||0;
+ let pontos=0,labels=[],dados=[];
+ for(let i=1;i<=v+e+d;i++){
+  if(i<=v) pontos+=3;
+  else if(i<=v+e) pontos+=1;
+  dados.push(((pontos/(i*3))*100).toFixed(1));
+  labels.push("Jogo "+i);
+ }
+ if(chart) chart.destroy();
+ chart=new Chart(grafico,{
+  type:"line",
+  data:{labels,datasets:[{
+   data:dados,
+   label:"Aproveitamento %",
+   borderColor:"#4caf50",
+   fill:true,
+   tension:.4
+  }]},
+  options:{scales:{y:{min:0,max:100}}}
+ });
 }
 
-/* FILTRO */
-function filtrar() {
-  const termo = busca.value.toLowerCase();
-  render(jogadores.filter(j =>
-    j.Jogador.toLowerCase().includes(termo)
-  ));
-}
-
-/* DARK */
-function toggleDark() {
-  document.body.classList.toggle("dark");
-}
-
-/* ESTATÍSTICAS */
-fetch(URLS.estatisticas)
-.then(r => r.json())
-.then(d => {
-  estatisticasDiv.innerHTML = "<h2 style='margin:10px'>🎯 Artilharia</h2>";
-  d.sort((a,b) => b.Gols - a.Gols).forEach((j,i) => {
-    estatisticasDiv.innerHTML += `
-      <div class="card">
-        <div class="linha">
-          <span>${i+1}º ${j.Jogador}</span>
-          <strong>${j.Gols} ⚽</strong>
-        </div>
-        <small>Jogos: ${j.Jogos} | Média: ${j.Media}</small>
-      </div>
-    `;
-  });
+/* ARTILHARIA */
+fetch(URLS.estatisticas).then(r=>r.json()).then(d=>{
+ estatisticas.innerHTML="<h2 style='margin:10px'>🎯 Artilharia</h2>";
+ d.sort((a,b)=>b.Gols-a.Gols).forEach((j,i)=>{
+  estatisticas.innerHTML+=`
+   <div class="card">
+    <div class="linha">
+     <span>${i+1}º ${j.Jogador}</span>
+     <strong>${j.Gols} ⚽</strong>
+    </div>
+    <small>Jogos: ${j.Jogos} | Média: ${j.Media}</small>
+   </div>`;
+ });
 });
 
-/* JOGOS (100% FUNCIONAL) */
-fetch(URLS.jogos)
-.then(r => r.json())
-.then(lista => {
-  jogosDiv.innerHTML = "<h2 style='margin:10px'>📅 Jogos</h2>";
-
-  lista.forEach(j => {
-    const card = document.createElement("div");
-    card.className = "card";
-
-    card.innerHTML = `
-      <strong>Rodada ${j.Rodada}</strong><br><br>
-      <div style="display:flex; justify-content:space-between; font-size:18px;">
-        <strong>${j.Time_Casa}</strong>
-        <span>${j.Gols_Casa} x ${j.Gols_Fora}</span>
-        <strong>${j.Time_Fora}</strong>
-      </div>
-    `;
-
-    card.addEventListener("click", () => {
-      modalTitulo.innerText = `${j.Time_Casa} ${j.Gols_Casa} x ${j.Gols_Fora} ${j.Time_Fora}`;
-      timeCasa.innerText = j.Time_Casa;
-      timeFora.innerText = j.Time_Fora;
-      golsCasa.innerText = j.Artilharia_Casa || "Sem gols";
-      golsFora.innerText = j.Artilharia_Fora || "Sem gols";
-      modalBg.style.display = "flex";
-    });
-
-    jogosDiv.appendChild(card);
-  });
+/* JOGOS */
+fetch(URLS.jogos).then(r=>r.json()).then(d=>{
+ jogosLista=d;
+ montarFiltro();
+ renderJogos(d);
 });
 
-function fecharModal(e) {
-  if (e.target === modalBg) modalBg.style.display = "none";
+function montarFiltro(){
+ [...new Set(jogosLista.map(j=>j.Rodada))].forEach(r=>{
+  filtroRodada.innerHTML+=`<option value="${r}">Rodada ${r}</option>`;
+ });
 }
-</script>
 
-<script>
-if ("serviceWorker" in navigator) {
-  window.addEventListener("load", () => {
-    navigator.serviceWorker.register("service-worker.js");
-  });
+function filtrarRodada(){
+ const r=filtroRodada.value;
+ renderJogos(r==="todas"?jogosLista:jogosLista.filter(j=>j.Rodada===r));
 }
+
+function renderJogos(lista){
+ listaJogos.innerHTML="";
+ lista.forEach(j=>{
+  listaJogos.innerHTML+=`
+   <div class="card" onclick="abrirModal('${j.Time_Casa}','${j.Time_Fora}','${j.Artilharia_Casa}','${j.Artilharia_Fora}')">
+    <strong>Rodada ${j.Rodada}</strong><br><br>
+    <div class="linha">
+     <span>${j.Time_Casa}</span>
+     <strong>${j.Gols_Casa} x ${j.Gols_Fora}</strong>
+     <span>${j.Time_Fora}</span>
+    </div>
+   </div>`;
+ });
+}
+
+function abrirModal(c,f,ac,af){
+ modalTitulo.innerText=`${c} x ${f}`;
+ golsCasa.innerText=ac||"Sem gols";
+ golsFora.innerText=af||"Sem gols";
+ destaquePartida.innerText=ac||af?"⭐ Destaque da partida":"";
+ modalBg.style.display="flex";
+}
+function fecharModal(e){if(e.target===modalBg)modalBg.style.display="none"}
+
+function toggleDark(){document.body.classList.toggle("dark")}
 </script>
 
 </body>
