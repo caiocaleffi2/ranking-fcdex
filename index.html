@@ -259,13 +259,15 @@ function renderJogos(lista){
  lista.forEach(j=>{
   listaJogos.innerHTML+=`
    <div class="card" onclick="abrirModal(
-     '${j.Time_Casa}',
-     '${j.Time_Fora}',
-     '${j.Artilharia_Casa}',
-     '${j.Artilharia_Fora}',
-     '${j.Escalacao_Preto}',
-     '${j.Escalacao_Amarelo}'
-   )">
+  '${j.Time_Casa}',
+  '${j.Time_Fora}',
+  '${j.Artilharia_Casa}',
+  '${j.Artilharia_Fora}',
+  '${j.Escalacao_Preto}',
+  '${j.Escalacao_Amarelo}',
+  '${j.Destaque}'
+)"
+">
     <strong>Rodada ${j.Rodada}</strong><br>
     <small>
       📅 ${j.Data || "Data a definir"} |
@@ -283,12 +285,14 @@ function renderJogos(lista){
 }
 
 /* MODAL + ESCALAÇÃO */
-function abrirModal(c,f,ac,af,ep,ea){
+function abrirModal(c,f,ac,af,ep,ea,d){
  jogoAtual={ep,ea};
  modalTitulo.innerText=`${c} x ${f}`;
  golsCasa.innerText=ac||"Sem gols";
  golsFora.innerText=af||"Sem gols";
- destaquePartida.innerText=ac||af?"⭐ Destaque da partida":"";
+ destaquePartida.innerText = d 
+  ? `⭐ ${d}` 
+  : "";
  blocoEscalacao.style.display="none";
  blocoEscalacao.innerHTML="";
  modalBg.style.display="flex";
