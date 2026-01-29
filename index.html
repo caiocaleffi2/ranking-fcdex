@@ -62,9 +62,23 @@ body.dark .menu{background:#1e1e1e}
  padding:20px;
  border-radius:12px;
  width:90%;
- max-width:400px
+ max-width:420px
 }
 body.dark .modal{background:#1e1e1e}
+
+.escalacoes{
+ display:flex;
+ gap:12px;
+ margin-top:12px
+}
+.escalacoes .time{
+ flex:1;
+ background:#f2f2f2;
+ border-radius:8px;
+ padding:10px
+}
+body.dark .escalacoes .time{background:#2a2a2a}
+.escalacoes ul{padding-left:18px;margin:6px 0}
 </style>
 </head>
 
@@ -106,6 +120,9 @@ body.dark .modal{background:#1e1e1e}
     <hr>
     <p><strong>Casa:</strong> <span id="golsCasa"></span></p>
     <p><strong>Fora:</strong> <span id="golsFora"></span></p>
+
+    <button onclick="toggleEscalacao()">👥 Ver escalação</button>
+    <div id="blocoEscalacao" style="display:none"></div>
   </div>
 </div>
 
@@ -117,7 +134,7 @@ const URLS={
  jogos:`https://opensheet.elk.sh/${SHEET_ID}/Jogos`
 };
 
-let jogadores=[],jogosLista=[],chart;
+let jogadores=[],jogosLista=[],chart,jogoAtual=null;
 
 /* TELAS */
 function mostrarTela(id){
@@ -236,18 +253,17 @@ function renderJogos(lista){
      '${j.Time_Casa}',
      '${j.Time_Fora}',
      '${j.Artilharia_Casa}',
-     '${j.Artilharia_Fora}'
+     '${j.Artilharia_Fora}',
+     '${j.Escalacao_Preto}',
+     '${j.Escalacao_Amarelo}'
    )">
-
     <strong>Rodada ${j.Rodada}</strong><br>
     <small>
       📅 ${j.Data || "Data a definir"} |
       ⏰ ${j.Hora || "--:--"}<br>
       📍 ${j.Local || "Local não informado"}
     </small>
-
     <br><br>
-
     <div class="linha">
      <span>${j.Time_Casa}</span>
      <strong>${j.Gols_Casa} x ${j.Gols_Fora}</strong>
@@ -257,16 +273,41 @@ function renderJogos(lista){
  });
 }
 
-
-function abrirModal(c,f,ac,af){
+/* MODAL + ESCALAÇÃO */
+function abrirModal(c,f,ac,af,ep,ea){
+ jogoAtual={ep,ea};
  modalTitulo.innerText=`${c} x ${f}`;
  golsCasa.innerText=ac||"Sem gols";
  golsFora.innerText=af||"Sem gols";
  destaquePartida.innerText=ac||af?"⭐ Destaque da partida":"";
+ blocoEscalacao.style.display="none";
+ blocoEscalacao.innerHTML="";
  modalBg.style.display="flex";
 }
-function fecharModal(e){if(e.target===modalBg)modalBg.style.display="none"}
 
+function toggleEscalacao(){
+ if(!jogoAtual) return;
+ blocoEscalacao.innerHTML=`
+  <div class="escalacoes">
+   <div class="time">
+    <strong>⚫ Time Preto</strong>
+    <ul>${formatar(jogoAtual.ep)}</ul>
+   </div>
+   <div class="time">
+    <strong>🟡 Time Amarelo</strong>
+    <ul>${formatar(jogoAtual.ea)}</ul>
+   </div>
+  </div>`;
+ blocoEscalacao.style.display =
+  blocoEscalacao.style.display==="none"?"block":"none";
+}
+
+function formatar(lista){
+ if(!lista) return "<li>Escalação não informada</li>";
+ return lista.split(",").map(j=>`<li>${j.trim()}</li>`).join("");
+}
+
+function fecharModal(e){if(e.target===modalBg)modalBg.style.display="none"}
 function toggleDark(){document.body.classList.toggle("dark")}
 </script>
 
