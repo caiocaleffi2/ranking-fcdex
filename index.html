@@ -163,12 +163,21 @@ function renderRanking(lista){
      <span>${i+1}º ${j.Jogador}</span>
      <span class="badge ${badge(ap)}">${ap}%</span>
     </div>
+
+    <small style="opacity:.7">
+      Pontos: <strong>${j.Pontuação || 0}</strong>
+    </small>
+
     <div class="barra">
-     <span style="width:${ap}%;background:${badge(ap)==="verde"?"green":badge(ap)==="amarelo"?"orange":"red"}"></span>
+     <span style="
+       width:${ap}%;
+       background:${badge(ap)==="verde"?"green":badge(ap)==="amarelo"?"orange":"red"}
+     "></span>
     </div>
    </div>`;
  });
 }
+
 
 function filtrar(){
  const t=busca.value.toLowerCase();
